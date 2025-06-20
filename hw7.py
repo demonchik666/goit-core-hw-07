@@ -26,9 +26,10 @@ class Birthday(Field):
             birthday_date = dt.strptime(value, '%d.%m.%Y')
             if birthday_date > dt.today():
                 raise ValueError("Birthday cannot be in the future.")
+            birthday_date_str = birthday_date.strftime('%d.%m.%Y')
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
-        self.value = birthday_date
+        self.value = birthday_date_str
         
 class Record:
     def __init__(self, name):
@@ -89,8 +90,8 @@ class AddressBook(UserDict):
         for record in self.values():
             if record.birthday is None:
                 continue
-        # Беремо саме дату (datetime) з об'єкта Birthday
-            birthday_date = record.birthday.value
+        # Беремо саме дату (string) з об'єкта Birthday
+            birthday_date = dt.strptime(record.birthday.value, ('%d.%m.%Y'))
         # Створюємо дату дня народження на цей рік
             birthday_this_year = birthday_date.replace(year=today.year)
         # Якщо день народження вже минув цього року — переносимо на наступний рік
@@ -206,6 +207,8 @@ def print_all(book: AddressBook): # Function to print all contacts
             result += f"{record.name.value}: "
             if record.phones:
                 result += ", ".join(phone.value for phone in record.phones)
+            if record.birthday:
+                result += f" | Birthday: {record.birthday.value}"
             result += "\n"
         return result
     
